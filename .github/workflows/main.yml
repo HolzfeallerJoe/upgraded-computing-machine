@@ -1,0 +1,22 @@
+name: Auto Merge Exercism PRs to Main
+
+on:
+  pull_request:
+    types: [labeled, opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    if: >
+      github.event.pull_request.base.ref == 'main' &&
+      contains(github.event.pull_request.labels.*.name, 'exercism')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge PR into main
+        run: gh pr merge "$PR_URL" --merge --admin
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
